@@ -22,23 +22,17 @@ class RecapitoController extends Controller
 
     public function index()
     {
-        if (Gate::allows('leggere')) {
-            if (Gate::allows('Amministratore') || Gate::allows('Utente') || Gate::allows('Ospite')) {
-                $recapito = Recapito::all();
-                $risorsa = null;
-                if (request("tipo") != null && request("tipo") == "completo") {
-                    $risorsa = new RecapitoCompletoCollection($recapito);
-                } else {
-                    $risorsa = new RecapitoCollection($recapito);
-                }
-                return $risorsa;
-            } else {
-                abort(403, 'PE_0001');
-            }
+
+        $recapito = Recapito::all();
+        $risorsa = null;
+        if (request("tipo") != null && request("tipo") == "completo") {
+            $risorsa = new RecapitoCompletoCollection($recapito);
         } else {
-            abort(403, 'PE_0002');
+            $risorsa = new RecapitoCollection($recapito);
         }
+        return $risorsa;
     }
+
     /**
      * Store a newly created resource in storage.
      * @param \Illuminate\Http\Requests\v1|TipologiaIndirizzoStoreRequest $request

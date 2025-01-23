@@ -26,7 +26,7 @@ class UploadController extends Controller
                 }
 
                 // Define the base path for storage
-                $basePath2 = public_path('storage/Film/V1/');
+                // $basePath2 = public_path('storage/Film/V1/');
                 $basePath = storage_path('app/public/Film/V1/');
 
                 // Create a new directory for the film ID
@@ -41,30 +41,27 @@ class UploadController extends Controller
                     // Move the uploaded video file to the new directory and rename it to filmato.mp4
                     $videoFile->move($filmPath, 'filmato.mp4');
 
-                    $rit["message"] = $basePath . " - " . $basePath2 . " - Trailer OK";
-
+                    $rit["data"] = true;
                     // Check for the film.mp4 file upload
-                    if ($request->hasFile('film')) {
-                        $filmFile = $request->file('film');
-                        // Move the uploaded film file to the new directory and rename it to film.mp4
-                        $filmFile->move($filmPath, 'film.mp4');
 
-                        $rit["message"] .= " - Film OK";
+                } else {
+                    $rit["message"] = "No locandina file uploaded.";
+                }
+                if ($request->hasFile('film')) {
+                    $filmFile = $request->file('film');
+                    // Move the uploaded film file to the new directory and rename it to film.mp4
+                    $filmFile->move($filmPath, 'film.mp4');
+                    $rit["data"] = true;
+                } else {
+                    $rit["message"] = "No film file uploaded.";
+                }
+                // Check for the poster image upload
+                if ($request->hasFile('locandina')) {
+                    $posterFile = $request->file('locandina');
+                    // Move the uploaded poster file to the same directory and rename it to locandina.jpg
+                    $posterFile->move($filmPath, 'locandina.jpg');
 
-                        // Check for the poster image upload
-                        if ($request->hasFile('locandina')) {
-                            $posterFile = $request->file('locandina');
-                            // Move the uploaded poster file to the same directory and rename it to locandina.jpg
-                            $posterFile->move($filmPath, 'locandina.jpg');
-
-                            $rit["data"] = true; // Indicate success for film upload
-                            $rit["message"] .= " - Locandina OK";
-                        } else {
-                            $rit["message"] = "No locandina file uploaded.";
-                        }
-                    } else {
-                        $rit["message"] = "No film file uploaded.";
-                    }
+                    $rit["data"] = true; // Indicate success for film upload
                 } else {
                     $rit["data"] = false;
                     $rit["message"] = "No video file uploaded.";
@@ -106,33 +103,30 @@ class UploadController extends Controller
                     mkdir($serieTvPath, 0755, true); // Create the directory if it doesn't exist
                 }
 
-                // Create an empty directory in the Episodi folder with the same ID
-                $episodiBasePath = public_path('storage/Episodi/V1/');
-                $episodiPath = $episodiBasePath . 'ID_' . $this->formatId($serieTvId);
-                if (!file_exists($episodiPath)) {
-                    mkdir($episodiPath, 0755, true); // Create the directory if it doesn't exist
-                }
-
                 // Check for the video file upload
                 if ($request->hasFile('videoFile')) {
                     $videoFile = $request->file('videoFile');
                     // Move the uploaded video file to the new directory and rename it to filmato.mp4
                     $videoFile->move($serieTvPath, 'filmato.mp4');
-                    if ($request->hasFile('locandina')) {
-                        $posterFile = $request->file('locandina');
-                        // Move the uploaded poster file to the same directory and rename it to locandina.jpg
-                        $posterFile->move($serieTvPath, 'locandina.jpg');
-                        $rit["data"] = true;
-                    } else {
-                        $rit["message"] = "No locandina file uploaded.";
-                    }
+                    $rit["videoFile"] = true; // Indicate success for video upload
                 } else {
-                    $rit["data"] = false;
+                    $rit["videoFile"] = false;
                     $rit["message"] = "No video file uploaded.";
                 }
 
-                // Check for the poster image upload
+                // Check for the locandina image upload
+                if ($request->hasFile('locandina')) {
+                    $posterFile = $request->file('locandina');
+                    // Move the uploaded poster file to the same directory and rename it to locandina.jpg
+                    $posterFile->move($serieTvPath, 'locandina.jpg');
+                    $rit["locandina"] = true; // Indicate success for locandina upload
+                } else {
+                    $rit["locandina"] = false;
+                    $rit["message"] = "No locandina file uploaded.";
+                }
 
+                // Set the overall success status
+                $rit["data"] = $rit["videoFile"] || $rit["locandina"];
 
                 return json_encode($rit);
             } else {
