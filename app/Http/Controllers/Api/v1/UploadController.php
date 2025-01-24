@@ -49,7 +49,6 @@ class UploadController extends Controller
                 }
                 if ($request->hasFile('film')) {
                     $filmFile = $request->file('film');
-                    // Move the uploaded film file to the new directory and rename it to film.mp4
                     $filmFile->move($filmPath, 'film.mp4');
                     $rit["data"] = true;
                 } else {
