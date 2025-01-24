@@ -54,7 +54,6 @@ class UploadController extends Controller
                 } else {
                     $rit["message"] = "No film file uploaded.";
                 }
-                // Check for the poster image upload
                 if ($request->hasFile('locandina')) {
                     $posterFile = $request->file('locandina');
                     // Move the uploaded poster file to the same directory and rename it to locandina.jpg
